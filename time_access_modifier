@@ -1,0 +1,62 @@
+/*
+
+--> try calling "empadd" function repeatedly
+--> access to the "addemp" function is allowed only after 50secs of its prior access            
+--> the epoch time is specified at the begining and is incremented each time its accessed
+--> at each accessed , the accesstime is set to 50secs after the current accesstime
+
+*/
+pragma solidity ^0.5.0;
+contract practise1{
+    enum Status{inactive,active,idle,running}
+    Status internal status=Status.inactive;     //nodes cant access internal functions 
+    string internal mail="_yourmailid_";        //can be accessed only by the contract itself
+    
+     
+    struct Person{
+        Status status;
+        uint phone;
+        string name;
+        string mail;
+    }
+    mapping(string => Person) employee;
+   
+    uint Availtime=1566748450;                          // initializing epoch time while deploying    
+   
+    modifier onlyAfterTime{                             // checking for time to verify if access
+        require(block.timestamp>=Availtime);            // for function is allowed
+        Availtime=block.timestamp+50;                   // incrementing the allowance time 
+        _;
+    }
+    
+    
+       
+    function addemp(string memory _mail,        
+    Status _status,uint _phone,                 
+    string memory _name)
+    public 
+    onlyAfterTime                                       // this function can be accessed only 
+    {                                                   // after 50 secs of its prior access
+        employee[_mail]=Person(_status,
+        _phone,_name,_mail);
+    }
+    
+    function changestatus(string memory _mail)public{
+        Status _cstatus=employee[_mail].status;
+        if(_cstatus==Status.inactive)
+            employee[_mail].status=Status.idle;
+        else if(_cstatus==Status.active)
+            employee[_mail].status=Status.running;
+        else if(_cstatus==Status.idle)
+            employee[_mail].status=Status.inactive;
+    }
+    
+    function empdetails(string memory _mail)
+    public view returns(Status,uint,
+    string memory,string memory)
+    {
+        return(employee[_mail].status,
+        employee[_mail].phone,employee[_mail].name,
+        employee[_mail].mail);
+    }
+}
