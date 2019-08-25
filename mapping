@@ -1,0 +1,31 @@
+pragma solidity ^0.5.0;
+contract practise1{
+    enum Status{inactive,active,idle,running}
+    Status public status=Status.inactive;
+    string public mail="_yourmailid_";
+    struct Person{
+        Status status;
+        uint phone;
+        string name;
+        string mail;
+    }
+    mapping(string => Person) employee;
+    
+    function addemp(string memory _mail,Status _status,uint _phone,string memory _name)public{
+        employee[_mail]=Person(_status,_phone,_name,_mail);
+    }
+    
+    function changestatus(string memory _mail)public{
+        Status _cstatus=employee[_mail].status;
+        if(_cstatus==Status.inactive)
+            employee[_mail].status=Status.idle;
+        else if(_cstatus==Status.active)
+            employee[_mail].status=Status.running;
+        else if(_cstatus==Status.idle)
+            employee[_mail].status=Status.inactive;
+    }
+    
+    function empdetails(string memory _mail)public view returns(Status,uint,string memory,string memory){
+        return(employee[_mail].status,employee[_mail].phone,employee[_mail].name,employee[_mail].mail);
+    }
+}
