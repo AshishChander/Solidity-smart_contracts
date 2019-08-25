@@ -1,0 +1,63 @@
+/*
+
+--> try calling the functions from different accounts/nodes 
+--> "addemp" function works only when its called from the account/node that deployed 
+     this contract
+--> other accounts/nodes are restricted from calling "addemp" functions
+--> other functions can be accessed by all accounts/nodes
+--> internal - access specifier keyword used to mark a function such that it can only be called 
+               from within the contract and not form any of the accounts/nodes 
+               
+*/
+pragma solidity ^0.5.0;
+contract practise1{
+    enum Status{inactive,active,idle,running}
+    Status internal status=Status.inactive;     //nodes cant access internal functions 
+    string internal mail="_yourmailid_";        //can be accessed only by the contract itself
+    
+     
+    struct Person{
+        Status status;
+        uint phone;
+        string name;
+        string mail;
+    }
+    mapping(string => Person) employee;
+    address admin;                              //modifier to restrict access based on owner 
+    modifier onlyAdmin{                         // of the contract 
+        require(msg.sender==admin);
+        _;
+    }
+    
+    constructor() public{                       //constructor to store adress of 
+        admin=msg.sender;                       //the node that deployed the contract
+    }
+       
+    function addemp(string memory _mail,        //can be accessed only by the node
+    Status _status,uint _phone,                 // that deployed this contract
+    string memory _name)
+    public 
+    onlyAdmin
+    {
+        employee[_mail]=Person(_status,_phone,_name,_mail);
+    }
+    
+    function changestatus(string memory _mail)public{
+        Status _cstatus=employee[_mail].status;
+        if(_cstatus==Status.inactive)
+            employee[_mail].status=Status.idle;
+        else if(_cstatus==Status.active)
+            employee[_mail].status=Status.running;
+        else if(_cstatus==Status.idle)
+            employee[_mail].status=Status.inactive;
+    }
+    
+    function empdetails(string memory _mail)
+    public view returns(Status,uint,
+    string memory,string memory)
+    {
+        return(employee[_mail].status,
+        employee[_mail].phone,employee[_mail].name,
+        employee[_mail].mail);
+    }
+}
