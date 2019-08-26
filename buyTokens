@@ -1,0 +1,33 @@
+/*
+--------contract to sell tockens in exchange for ether-----------
+-->deploy contract with any account/node and then
+    select different account/node and transact ethers 
+-->ethers can be sent from any account to the account/node 
+    that has deployed the smart contract.
+--> external - modifier which is a access specifies that 
+                allows the function to be called from 
+                externally only
+-->payable - keyword used to declare that 
+             a function deals with ethers
+
+*/
+pragma solidity ^0.5.0;
+contract practise2{
+    mapping(address => uint256)public balance;      //itself is a function
+    address payable wallet;                         //adress that may transcat
+    
+    constructor(address payable _wallet)public{
+        wallet=_wallet;
+    }
+    
+    function() external payable{                    //can be called only from 
+        buytoken();                                 //outside the contract
+    }
+    function buytoken()public payable{
+        balance[msg.sender]+=1;                     //increment tokens in the caller
+        wallet.transfer(msg.value);                 //transfer of ether 
+                                                    //callers wallet is added with a 
+                                                    //token for deduction of ethers
+    }
+    
+}
