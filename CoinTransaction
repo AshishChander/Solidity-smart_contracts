@@ -1,0 +1,38 @@
+/*
+Program to mint new coin and transact them between accounts/nodes
+--> initial number of coins are generated and alloted to contract deloyer(minter)
+--> accounts can check their balances
+--> accounts can buy coins from the minter by paying equivalent(enter manually)ethers
+--> any account may send coins to other account by its public id
+*/
+pragma solidity ^0.5.0;
+
+contract Coin {
+
+    address public minter;
+    mapping (address => uint) public balances;
+    address payable wallet;
+    
+    event Sent(address _from, address _to, uint _amount);
+    
+    constructor(address payable _wallet)payable public {                  
+        wallet=_wallet;
+        minter=msg.sender;
+        balances[minter] =100;
+    }
+
+    function sendCoins(address  _receiver, uint _amount) payable public {
+        require(balances[msg.sender]>=_amount, "Insufficient balance");
+        balances[msg.sender] -=_amount;
+        balances[_receiver] += _amount;
+        emit Sent(msg.sender, _receiver, _amount);
+    }  
+   
+    function buyCoins(uint256 _amount)payable public{
+        require(balances[minter]>=_amount,"Insufficient balance");
+        balances[msg.sender]+=_amount;
+        balances[minter]-=_amount;
+        wallet.transfer(msg.value);
+        
+    }
+}
