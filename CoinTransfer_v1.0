@@ -1,0 +1,31 @@
+pragma solidity ^0.5.0;
+
+contract Coin {
+
+    address public minter;
+    mapping (address => uint) public balances;
+    address payable wallet;
+    
+    event Sent(address _from, address _to, uint _amount);
+    
+    constructor(address payable _wallet) public {                  
+        wallet=_wallet;
+        minter=wallet;
+        balances[minter] =100;
+    }
+
+    function sendCoins(address  _receiver, uint _amount) public {
+        require(balances[msg.sender]>=_amount, "Insufficient balance");
+        balances[msg.sender] -=_amount;
+        balances[_receiver] += _amount;
+        emit Sent(msg.sender, _receiver, _amount);
+    }  
+   
+    function buyCoins(uint256 _amount) public{
+        require(balances[minter]>=_amount,"Insufficient balance");
+        balances[msg.sender]+=_amount;
+        balances[minter]-=_amount;
+       
+        
+    }
+}
